@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta
+         name="viewport"
+         content="width=device-width, initial-scale=1.0"
+         >
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+      <title>Stopwatch</title>
+      <style>
+         body {
+            background: gainsboro;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: Roboto;
+         }
+         .container {
+            text-align: center;
+            max-width: 600px;
+            margin: 48px auto;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: 'Roboto', sans-serif;
+         }
+         h1 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #4285F4;
+            border-bottom: 2px solid #4285f4;
+            padding: 15px 0;
+            margin: 0;
+            height: 16px;
+         }
+         #time {
+            font-size: 50px;
+            padding: 38px 24px;
+            text-align: left;
+            line-height: 1;
+            display: flex;
+            align-items: flex-end;
+            color: #222222;
+         }
+         #time span:first-child, #time span:nth-child(3), #time span:nth-child(5) {
+            font-size: 62px;
+            line-height: 0.9;
+         }
+         #time span:nth-child(2),#time span:nth-child(4), #time span:nth-child(6) {
+            font-size: 28px;
+            line-height: 1.2;
+         }
+         #time span:nth-child(7) {
+            padding-left: 20px;
+            line-height: 0.9;
+         }
+         .btns-container {
+            padding: 16px;
+            display: flex;
+            border-top: 1px solid #dadce0;
+         }
+         button {
+            padding: 8px 15px;
+            border: 1px solid #dadce0;
+            border-radius: 2px;
+            color: white;
+            cursor: pointer;
+            font-size: 11px;
+            width: 72px;
+            line-height: 1;
+         }
+         button:focus {
+            outline: none;
+         }
+         #start_btn {
+            background: #1a73e8;
+         }
+         #start_btn:active, #pause_btn:active {
+            background-color: #1b5fb9;
+         }
+         #pause_btn {
+            background: #1a73e8;
+            display: none;
+         }
+         #hours_val, #minutes_val, #minutes_keep,#hours_keep {
+            display: none;
+         }
+         #minutes_keep,#hours_keep {
+            padding-right: 20px;
+         }
+         #reset_btn {
+            border-color: #1a73e8;
+            margin-left: 16px;
+            background: #fff;
+            color: #1a73e8;
+         }
+         #reset_btn:active {
+            background-color: #e4eefc;
+         }
+      </style>
+   </head>
+   <body>
+      <div class="container">
+         <h1>Stopwatch</h1>
+         <div id="time">
+            <span id="hours_val">0</span>
+            <span id="hours_keep">h</span>
+            <span id="minutes_val">0</span>
+            <span id="minutes_keep">m</span>
+            <span id="seconds_val">0</span>
+            <span>s</span>
+            <span id="millis_val">00</span>
+         </div>
+         <div class="btns-container">
+            <button id="start_btn" onclick="start()"> START </button>
+            <button id="pause_btn" onclick="pause()"> STOP </button>
+            <button id="reset_btn" onclick="reset()"> RESET </button>
+         </div>
+      </div>
+      <script>
+        const start_btn = document.querySelector('#start_btn');
+        const pause_btn = document.querySelector('#pause_btn');
+        const reset_btn = document.querySelector('#reset_btn');
+        const hours_val = document.querySelector('#hours_val');
+        const hours_keep = document.querySelector('#hours_keep');
+        const minutes_val = document.querySelector('#minutes_val');
+        const minutes_keep = document.querySelector('#minutes_keep');
+        const seconds_val = document.querySelector('#seconds_val');
+        const millis_val = document.querySelector('#millis_val');
+        let times = [0, 0, 0, 0];
+        let time = 0,
+        interval;
+        function showTime() {
+            times[3] = times[3] + 1;
+            if (times[3] == 100) {
+                times[2] += 1;
+                times[3] = 0;
+            }
+            if (times[2] == 60) {
+                times[1] += 1;
+                times[2] = 0;
+                showBtn([minutes_val, minutes_keep]);
+            }
+            if (times[1] == 60) {
+                times[0] += 1;
+                times[1] = 0;
+                showBtn([hours_val, hours_keep]);
+            }
+            millis_val.innerHTML = `${times[3]}`.padStart(2, '0');
+            seconds_val.innerHTML = `${times[2]}`;
+            minutes_val.innerHTML = `${times[1]}`;
+            hours_val.innerHTML = `${times[0]}`;
+        }
+        function start() {
+            interval = setInterval(showTime, 10);
+            hideBtn([start_btn]);
+            showBtn([pause_btn, reset_btn]);
+        }
+
+        function pause() {
+            if (interval) {
+                clearInterval(interval);
+                interval = null;
+                pause_btn.innerHTML = 'START';
+            } else {
+                interval = setInterval(showTime, 10);
+                pause_btn.innerHTML = 'STOP';
+            }
+        }
+
+        function reset() {
+            clearInterval(interval);
+            interval = null;
+            times = [0, 0, 0, 0];
+            seconds_val.innerHTML = 0;
+            millis_val.innerHTML = '00';
+            hideBtn([pause_btn, hours_val, minutes_val, hours_keep, minutes_keep]);
+            showBtn([start_btn]);
+        }
+
+        function showBtn(btnArr) {
+            btnArr.forEach((btn) => (btn.style.display = 'inline-block'));
+        }
+        function hideBtn(btnArr) {
+            btnArr.forEach((btn) => (btn.style.display = 'none'));
+        }
+      </script>
+   </body>
+</html>
